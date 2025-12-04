@@ -22,7 +22,7 @@ Designed for simplicity and speed, it helps you find correct subtitles for movie
 
 <!-- Replace this with your actual screenshot path -->
 <p align="center">
-  <img src="assets/screenshot.png" alt="Subtitle Downloader Pro Screenshot" width="720">
+  <img src="assets/screenshot.png" alt="Subtitle Downloader Pro Screenshot" width="380">
 </p>
 
 ---
