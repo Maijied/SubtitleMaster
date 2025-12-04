@@ -1,16 +1,18 @@
 // background.js
 
-const OS_API_KEY = "Tu9FaiAaLkKAzsALV9DF9WIaouK8NLxp"; // your key
+const OS_API_KEY = "Tu9FaiAaLkKAzsALV9DF9WIaouK8NLxp"; // your API key
+
+const COMMON_HEADERS = {
+  "Api-Key": OS_API_KEY,
+  "X-User-Agent": "SubtitleDownloaderPro v1.0.2",
+  "Content-Type": "application/json"
+};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // EXACT headers that worked in curl
-  const COMMON_HEADERS = {
-    "Api-Key": OS_API_KEY,
-    "User-Agent": "SubtitleMaster v1.0.0",
-    "Content-Type": "application/json"
-  };
 
-  // SEARCH SUBTITLES
+  // ======================================================
+  //  SEARCH SUBTITLES
+  // ======================================================
   if (request.action === "searchSubtitles") {
     (async () => {
       try {
@@ -33,23 +35,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         const data = await response.json();
         const subtitles = Array.isArray(data.data) ? data.data : [];
+
         sendResponse({ subtitles });
       } catch (err) {
         console.error("Search error:", err);
         sendResponse({ error: err.message });
       }
     })();
+
     return true;
   }
 
-  // DOWNLOAD SUBTITLE
+  // ======================================================
+  //  DOWNLOAD SUBTITLE
+  // ======================================================
   if (request.action === "downloadSubtitle") {
     (async () => {
       try {
         const fileId = request.fileId;
         if (!fileId) throw new Error("No file_id provided");
 
-        // Step 1: get download link (same headers as curl)
+        // Step 1 — Get download token
         const tokenResponse = await fetch(
           "https://api.opensubtitles.com/api/v1/download",
           {
@@ -68,33 +74,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const tokenData = await tokenResponse.json();
         if (!tokenData.link) throw new Error("No download link returned");
 
-        // Step 2: fetch subtitle file
-        const subtitleResponse = await fetch(tokenData.link);
-        if (!subtitleResponse.ok) {
-          throw new Error(`Subtitle file error: ${subtitleResponse.status}`);
-        }
-
-        const subtitleText = await subtitleResponse.text();
-
-        // Step 3: trigger download
-        const blob = new Blob([subtitleText], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-
-        chrome.downloads.download(
-          {
-            url,
-            filename: tokenData.file_name || `subtitle-${fileId}.srt`,
-            saveAs: true
-          },
-          () => URL.revokeObjectURL(url)
-        );
+        // Step 2 — Chrome downloads directly from link (MV3 safe)
+        chrome.downloads.download({
+          url: tokenData.link,
+          filename: tokenData.file_name || `subtitle-${fileId}.srt`,
+          saveAs: true
+        });
 
         sendResponse({ success: true });
+
       } catch (err) {
         console.error("Download error:", err);
         sendResponse({ success: false, error: err.message });
       }
     })();
+
     return true;
   }
+
 });
