@@ -9,6 +9,13 @@
 Subtitle Downloader Pro is a lightweight and efficient Chrome extension that lets you search and download subtitles instantly using the official OpenSubtitles API.[web:21]  
 Designed for simplicity and speed, it helps you find correct subtitles for movies, TV shows, anime, documentaries, and more with just a click.[web:21]
 
+<!-- DOWNLOAD BUTTON -->
+<p align="center">
+  <a href="Download/subtitle-downloader.zip">
+    <img src="https://img.shields.io/badge/Download-subtitle--downloader.zip-blue?style=for-the-badge" alt="Download subtitle-downloader.zip">
+  </a>
+</p>
+
 ---
 
 ## Screenshot
@@ -53,6 +60,8 @@ subtitle-downloader/
 │── assets/
 │ ├── logo.png 
 │ └── screenshot.png 
+│── Download/
+│ ├── subtitle-downloader.zip
 
 ```
 
